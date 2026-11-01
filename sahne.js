@@ -606,6 +606,38 @@ const Sahne = (() => {
     animasyon(2.5, (t, ham) => (isik.intensity = Math.sin(ham * Math.PI) * 15), dogrusal).then(() => dinamik.remove(isik));
   }
 
+  // Haritaya bakıldığında herkese: hangi X'e bakıldığı belli olsun (içi değil).
+  // Sandığın etrafında beyaz bir halka yanıp söner, üstünde bir büyüteç belirir.
+  function hedefGoster(i) {
+    const h = hedefler[i];
+    if (!h) return;
+    const halka = new THREE.Mesh(
+      new THREE.RingGeometry(0.42, 0.5, 40),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false }),
+    );
+    halka.rotation.x = -Math.PI / 2;
+    halka.position.set(h.p.x, 0.05, h.p.z);
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.font = '96px serif';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText('🔍', 64, 70);
+    const doku = new THREE.CanvasTexture(c);
+    const buyutec = new THREE.Sprite(new THREE.SpriteMaterial({ map: doku, transparent: true, depthTest: false }));
+    buyutec.scale.set(0.6, 0.6, 1);
+    buyutec.position.set(h.p.x, 0.9, h.p.z);
+    dinamik.add(halka, buyutec);
+    animasyon(3, (t, ham) => {
+      const nabiz = 0.5 + 0.5 * Math.sin(ham * Math.PI * 6);
+      halka.material.opacity = (1 - ham * 0.7) * (0.4 + 0.6 * nabiz);
+      halka.scale.setScalar(1 + nabiz * 0.15);
+      buyutec.position.y = 0.9 + Math.sin(ham * Math.PI * 4) * 0.08;
+      buyutec.material.opacity = ham > 0.8 ? (1 - ham) * 5 : 1;
+    }, dogrusal).then(() => dinamik.remove(halka, buyutec));
+  }
+
   // ---------- İşaretler ve önizleme ----------
   function isaretle(hucreler, renk = 0x50ff70) {
     while (isaretGrubu.children.length) isaretGrubu.remove(isaretGrubu.children[0]);
@@ -736,7 +768,8 @@ const Sahne = (() => {
 
   return {
     SUTUN, SATIR,
-    baslat, sifirla, baslangicKur, hedefKur, karoKoy, karoPatlat, hedefAc, hedefParlat,
+    baslat, sifirla, baslangicKur, hedefKur, karoKoy, karoPatlat, hedefAc, hedefParlat, hedefGoster,
+    dikMi: () => kamera.aspect < 0.85,
     isaretle, hayaletGoster, karoResmi,
     hizli(acik) { hizliMod = acik; },
     tiklayinca(fn) { tiklaninca = fn; },

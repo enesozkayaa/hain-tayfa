@@ -108,8 +108,10 @@ const tahtadaMi = (x, y) => x >= 0 && x < Sahne.SUTUN && y >= 0 && y < Sahne.SAT
 const kenarlar = harfler => [...YON].map(h => harfler.includes(h));
 const cevir = (acik, cevrik) => (cevrik ? [acik[2], acik[3], acik[0], acik[1]] : acik);
 
-// İskeleden yürüyerek nerelere gidilebilir? (çıkmaz yoldan öteye geçilemez)
-function ulasim() {
+// İskeleden yürüyerek nerelere gidilebilir? Hazineye ulaşmak için çıkmaz yoldan öteye geçilemez.
+// gecirgen: yol koyarken çıkmaz yollar engel sayılmaz; böylece kayanın arkasına da yol döşenebilir
+// (sonradan kaya top güllesiyle uçurulup yerine düz yol konunca yol birleşir).
+function ulasim(gecirgen = false) {
   const gecilen = new Set([anahtar(BASLANGIC.x, BASLANGIC.y)]);
   const sira = [BASLANGIC];
   const hedefler = new Set();
@@ -125,7 +127,7 @@ function ulasim() {
         hedefler.add(n.no);
         continue;
       }
-      if (!n.acik[(s + 2) % 4] || !n.merkez || gecilen.has(anahtar(nx, ny))) continue;
+      if (!n.acik[(s + 2) % 4] || (!n.merkez && !gecirgen) || gecilen.has(anahtar(nx, ny))) continue;
       gecilen.add(anahtar(nx, ny));
       sira.push({ x: nx, y: ny });
     }
@@ -134,7 +136,7 @@ function ulasim() {
 }
 
 // Bu yol kartı buraya konabilir mi? Kenarlar komşularla uymalı ve iskeleye bağlanmalı.
-function yerUygunMu(x, y, acik, gecilen = ulasim().gecilen) {
+function yerUygunMu(x, y, acik, gecilen = ulasim(true).gecilen) {
   if (!tahtadaMi(x, y) || hucre(x, y)) return false;
   let bagli = false;
   for (let s = 0; s < 4; s++) {
@@ -148,7 +150,7 @@ function yerUygunMu(x, y, acik, gecilen = ulasim().gecilen) {
 }
 
 function uygunYerler(kart, cevrik) {
-  const { gecilen } = ulasim();
+  const { gecilen } = ulasim(true);
   const acik = cevir(kart.acik, cevrik);
   const liste = [];
   for (let y = 0; y < Sahne.SATIR; y++) {
@@ -172,8 +174,8 @@ function desteKur() {
     for (let n = 0; n < 2; n++) deste.push({ tur: 'tamir', aletler: [alet] });
   });
   [['kazma', 'fener'], ['fener', 'pusula'], ['kazma', 'pusula']].forEach(aletler => deste.push({ tur: 'tamir', aletler }));
-  for (let n = 0; n < 3; n++) deste.push({ tur: 'top' });
-  for (let n = 0; n < 6; n++) deste.push({ tur: 'harita' });
+  for (let n = 0; n < 4; n++) deste.push({ tur: 'top' });
+  for (let n = 0; n < 3; n++) deste.push({ tur: 'harita' });
   return karistir(deste);
 }
 
@@ -473,8 +475,10 @@ async function oyna(g) {
       Sahne.hedefParlat(g.hedef, h.altin);
       await haritaGoster(g.hedef, h.altin);
     } else {
-      mesaj(`🗺️ ${adEtiketi(o)} eski haritaya baktı: ${HEDEF_ADLARI[g.hedef]} X işaretine... Ne gördü acaba?`);
-      await bekle(1500);
+      // Diğerleri neye bakıldığını görür (içini değil)
+      Sahne.hedefGoster(g.hedef);
+      mesaj(`🗺️ ${adEtiketi(o)} eski haritayla <b>${HEDEF_ADLARI[g.hedef]}</b> X işaretinin altına baktı 🔍 Ne gördü acaba?`);
+      await bekle(3000);
     }
   }
   if (durum.asama !== 'oyun') return;
@@ -615,7 +619,12 @@ function eliCiz() {
     const b = document.createElement('button');
     b.className = `kartEl ${kart.tur}${k === durum.secili ? ' secili' : ''}`;
     b.innerHTML = kartGorunumu(kart);
-    if (kart.tur === 'yol' && k === durum.secili && durum.cevrik) b.querySelector('img').style.transform = 'rotate(180deg)';
+    // Kart resmi tahtanın ekrandaki yönüyle aynı dursun: telefon dikken tahta yan döner
+    // (iskele aşağıda), o zaman kart resmi de 90 derece döndürülür
+    if (kart.tur === 'yol') {
+      const aci = (Sahne.dikMi() ? -90 : 0) + (k === durum.secili && durum.cevrik ? 180 : 0);
+      if (aci) b.querySelector('img').style.transform = `rotate(${aci}deg)`;
+    }
     b.onclick = () => kartSec(k);
     kutu.appendChild(b);
   });
@@ -733,6 +742,14 @@ function mesaj(html) {
 // ---------- Başlangıç ----------
 Sahne.baslat($('sahne'));
 Sahne.tiklayinca(hucreTiklandi);
+// Telefon döndürülünce kart resimlerinin yönü de güncellensin
+window.addEventListener('resize', () => {
+  if (durum.asama === 'oyun') eliCiz();
+});
+// iPhone'da iki parmakla ya da çift dokunuşla sayfa yakınlaşmasın
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+
 Sahne.uzerineGelinince(h => {
   const kart = ben()?.el[durum.secili];
   if (!h || !kart || kart.tur !== 'yol' || !benimSiram() || !aletlerTamam(ben())) {
