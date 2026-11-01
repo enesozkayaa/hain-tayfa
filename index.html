@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b2a3a">
+  <title>Hain Tayfa</title>
+  <meta name="description" content="Korsanlar hazineye yol açıyor, aralarında gizli hainler var. Arkadaşlarınla online oyna.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="ikonlar/ikon-192.png">
+  <link rel="apple-touch-icon" href="ikonlar/ikon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Hain Tayfa">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="sahne"></div>
+
+  <header id="oyuncular"></header>
+  <div id="deste" hidden></div>
+  <div id="ustDugmeler">
+    <button id="rolBtn" title="Rolümü göster" hidden>👁️</button>
+    <button id="menuBtn" title="Ana menüye dön" hidden>🏠</button>
+    <button id="sesBtn" title="Sesi aç/kapat">🔊</button>
+  </div>
+
+  <div id="alt">
+    <div id="mesaj" hidden></div>
+    <div id="eylemler" hidden>
+      <button id="cevirBtn" class="ikinci">↻ Çevir</button>
+      <button id="atBtn" class="ikinci">🗑️ Kartı at</button>
+    </div>
+    <div id="el" hidden></div>
+  </div>
+
+  <section id="menu" class="ekran">
+    <div class="kart">
+      <h1>Hain Tayfa</h1>
+      <p class="alt-baslik">Hazineye yol aç. Aranızdaki haini bul.</p>
+
+      <h3>🌐 Arkadaşlarınla online</h3>
+      <input id="onlineAd" class="giris" maxlength="12" placeholder="Adın" autocomplete="off">
+      <div class="onlineSatir">
+        <button id="odaAcBtn">Oda aç</button>
+        <input id="odaKodu" class="giris" maxlength="5" placeholder="Oda kodu" autocomplete="off" autocapitalize="characters">
+        <button id="katilBtn" class="ikinci">Katıl</button>
+      </div>
+      <div id="onlineDurum"></div>
+      <label id="onlineHainSatiri" class="hainSatiri" hidden>🐀 Hain sayısı <select id="onlineHain"></select></label>
+      <button id="onlineBaslaBtn" hidden disabled>Oyunu başlat</button>
+
+      <h3>📱 Tek telefonda (sırayla)</h3>
+      <div id="oyuncuSayisi" class="secenekler"></div>
+      <div id="isimler"></div>
+      <label class="hainSatiri">🐀 Hain sayısı <select id="yerelHain"></select></label>
+      <button id="baslaBtn">Yelken aç</button>
+
+      <details>
+        <summary>Nasıl oynanır?</summary>
+        <ol>
+          <li>Herkes gizlice rolünü görür: <b>🏴‍☠️ sadık tayfa</b> ya da <b>🐀 hain</b>. Kimin hain olduğunu kimse bilmez.</li>
+          <li>Soldaki iskeleden sağdaki 3 <b>X işaretine</b> doğru yol açılır. Sadece birinin altında hazine var.</li>
+          <li>Sıran gelince elindeki bir kartı oyna ya da işine yaramayan bir kartı at. Sonra desteden yeni kart çekersin.</li>
+          <li><b>Yol kartları</b> komşularına uymalı ve iskeleye bağlanmalı. ↻ ile ters çevrilebilir. Kayalı (çıkmaz) yollar yolu keser.</li>
+          <li><b>⛏️🏮🧭 Kır</b>: bir oyuncunun aletini kırar; aleti kırık olan yol koyamaz. <b>Tamir</b> kartı onarır.</li>
+          <li><b>💣 Top güllesi</b> bir yolu havaya uçurur. <b>🗺️ Harita</b> ile bir X'in altına gizlice bakarsın.</li>
+          <li>Yol yanlış X'e ulaşırsa ahtapot çıkar ve yolu açanın bir aleti kırılır!</li>
+          <li>Yol hazineye ulaşırsa <b>tayfa</b>, kartlar biterse <b>hainler</b> kazanır.</li>
+        </ol>
+      </details>
+      <p id="surumNotu" class="surum"></p>
+    </div>
+  </section>
+
+  <section id="perde" class="ekran koyu" hidden>
+    <div class="kart">
+      <h2 id="perdeBaslik"></h2>
+      <p id="perdeAciklama"></p>
+      <button id="perdeBtn"></button>
+    </div>
+  </section>
+
+  <section id="rolEkrani" class="ekran koyu" hidden>
+    <div class="kartKutusu">
+      <div id="rolKarti" class="rolKarti"></div>
+      <p id="rolNot" class="not"></p>
+      <button id="rolTamam">Anladım</button>
+    </div>
+  </section>
+
+  <section id="haritaEkrani" class="ekran" hidden>
+    <div class="kart haritaKart">
+      <h2>🗺️ Eski harita</h2>
+      <p id="haritaMetni"></p>
+      <p id="haritaNot" class="not"></p>
+      <button id="haritaTamam">Tamam</button>
+    </div>
+  </section>
+
+  <section id="cikisEkrani" class="ekran" hidden>
+    <div class="kart">
+      <h2>🏠 Ana menüye dön</h2>
+      <p id="cikisMetni"></p>
+      <div class="ikiDugme">
+        <button id="cikisHayir" class="ikinci">Hayır, devam</button>
+        <button id="cikisEvet">Evet, çık</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="sonuc" class="ekran" hidden>
+    <div class="kart">
+      <h2 id="sonucBaslik"></h2>
+      <div id="sonucAciklama"></div>
+      <button id="tekrarBtn">Ana menü</button>
+    </div>
+  </section>
+
+  <section id="baglantiEkrani" class="ekran" hidden>
+    <div class="kart">
+      <h2>📡 Bağlantı</h2>
+      <p id="baglantiMetni"></p>
+      <button id="yenidenBaglanBtn">🔄 Yeniden bağlan</button>
+    </div>
+  </section>
+
+  <!-- 3D motoru (Three.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+  <script src="ses.js"></script>
+  <script src="sahne.js"></script>
+  <script src="oyun.js"></script>
+  <!-- Online oyun: PeerJS telefonları doğrudan bağlar; ag.js oda açma/katılma ve hamle aktarımını yapar -->
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="ag.js"></script>
+  <script>
+    // Servis çalışanı: telefona kurulum ve otomatik güncelleme için (sadece internetten açılınca)
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      const eskiKontrol = navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (eskiKontrol && durum.asama === 'menu' && AG.mod === 'yerel') location.reload();
+      });
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>

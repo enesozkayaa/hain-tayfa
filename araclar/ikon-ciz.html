@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+  Hain Tayfa - uygulama simgesini çizer.
+  Adres sonuna ?boyut=512&pay=0.08 yazılır (pay: kenar boşluğu; "maskable" simgede daha büyük).
+  PNG'ye çevirmek için Edge görünmez modda ekran görüntüsü alır:
+    msedge --headless --hide-scrollbars --window-size=512,512 --screenshot=ikonlar/ikon-512.png "file:///.../araclar/ikon-ciz.html?boyut=512&pay=0.08"
+-->
+<html>
+<head>
+<meta charset="UTF-8">
+<style>html, body { margin: 0; background: #0b2a3a; overflow: hidden; } canvas { display: block; }</style>
+</head>
+<body>
+<script>
+  const ayar = new URLSearchParams(location.search);
+  const boyut = +(ayar.get('boyut') || 512);
+  const pay = +(ayar.get('pay') || 0.08);
+  const c = document.createElement('canvas');
+  c.width = c.height = boyut;
+  document.body.appendChild(c);
+  const g = c.getContext('2d');
+  g.scale(boyut / 512, boyut / 512);
+
+  // Gökyüzü ve deniz
+  const gok = g.createLinearGradient(0, 0, 0, 512);
+  gok.addColorStop(0, '#f6b25a');
+  gok.addColorStop(0.5, '#e0703a');
+  gok.addColorStop(0.5, '#1d6f94');
+  gok.addColorStop(1, '#0b2a3a');
+  g.fillStyle = gok;
+  g.fillRect(0, 0, 512, 512);
+
+  g.save();
+  const k = 1 - pay;
+  g.translate(256, 256);
+  g.scale(k, k);
+  g.translate(-256, -256);
+
+  // Batan güneş
+  g.fillStyle = '#ffe08a';
+  g.beginPath();
+  g.arc(256, 256, 70, Math.PI, 0);
+  g.fill();
+
+  // Ada
+  g.fillStyle = '#e2c98f';
+  g.beginPath();
+  g.ellipse(256, 330, 190, 55, 0, 0, Math.PI * 2);
+  g.fill();
+
+  // Hazine sandığı
+  g.fillStyle = '#6e4420';
+  g.fillRect(186, 250, 140, 82);
+  g.fillStyle = '#7d5028';
+  g.beginPath();
+  g.moveTo(186, 252);
+  g.quadraticCurveTo(256, 185, 326, 252);
+  g.closePath();
+  g.fill();
+  g.fillStyle = '#e8b84a';
+  [200, 300].forEach(x => g.fillRect(x, 220, 12, 112));
+  g.fillRect(186, 266, 140, 9);
+  g.fillRect(247, 262, 18, 22);
+
+  // Kırmızı X
+  g.strokeStyle = '#c0201a';
+  g.lineWidth = 16;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(150, 350);
+  g.lineTo(200, 390);
+  g.moveTo(200, 350);
+  g.lineTo(150, 390);
+  g.stroke();
+
+  // Korsan bayrağı
+  g.fillStyle = '#3a2614';
+  g.fillRect(352, 110, 10, 230);
+  g.fillStyle = '#111';
+  g.beginPath();
+  g.moveTo(362, 112);
+  g.lineTo(460, 125);
+  g.lineTo(450, 190);
+  g.lineTo(362, 185);
+  g.closePath();
+  g.fill();
+  g.fillStyle = '#eee';
+  g.beginPath();
+  g.arc(408, 143, 17, 0, Math.PI * 2);
+  g.fill();
+  g.fillRect(398, 152, 20, 12);
+  g.fillStyle = '#111';
+  g.beginPath();
+  g.arc(402, 142, 4.5, 0, Math.PI * 2);
+  g.arc(414, 142, 4.5, 0, Math.PI * 2);
+  g.fill();
+
+  // Gizlenmiş hain: sandığın arkasından bakan sıçan gözleri
+  [[232, 245], [270, 245]].forEach(([x, y]) => {
+    g.shadowColor = '#ff3020';
+    g.shadowBlur = 14;
+    g.fillStyle = '#ff4a30';
+    g.beginPath();
+    g.arc(x + 10, y - 52, 7, 0, Math.PI * 2);
+    g.fill();
+  });
+  g.restore();
+</script>
+</body>
+</html>
