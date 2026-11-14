@@ -51,12 +51,16 @@
       </div>
       <div id="onlineDurum"></div>
       <label id="onlineHainSatiri" class="hainSatiri" hidden>🐀 Hain sayısı <select id="onlineHain"></select></label>
+      <label id="onlineTopSatiri" class="hainSatiri" hidden>💣 Top güllesi kartı <select id="onlineTop"><option>0</option><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></label>
+      <label id="onlineHaritaSatiri" class="hainSatiri" hidden>🗺️ Harita kartı <select id="onlineHarita"><option>0</option><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></label>
       <button id="onlineBaslaBtn" hidden disabled>Oyunu başlat</button>
 
       <h3>📱 Tek telefonda (sırayla)</h3>
       <div id="oyuncuSayisi" class="secenekler"></div>
       <div id="isimler"></div>
       <label class="hainSatiri">🐀 Hain sayısı <select id="yerelHain"></select></label>
+      <label class="hainSatiri">💣 Top güllesi kartı <select id="yerelTop"><option>0</option><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></label>
+      <label class="hainSatiri">🗺️ Harita kartı <select id="yerelHarita"><option>0</option><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></label>
       <button id="baslaBtn">Yelken aç</button>
 
       <details>
@@ -160,6 +164,8 @@
       }
       document.addEventListener('focusout', function (e) { if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) setTimeout(sifirla, 50); });
       window.addEventListener('orientationchange', function () { setTimeout(sifirla, 300); });
+      if (window.visualViewport) visualViewport.addEventListener('resize', function () { if (visualViewport.scale > 1.01 && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) sifirla(); });
+      document.addEventListener('dblclick', function (e) { e.preventDefault(); }, { passive: false });
       ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
     })();
   </script>

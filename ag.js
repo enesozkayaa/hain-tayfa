@@ -20,7 +20,7 @@
 
 const Ag = (() => {
   // Online kısmı her değiştiğinde 1 artır: eski sürümle gelen oyuncu odaya alınmaz
-  const SURUM = 2;
+  const SURUM = 3;
   const ODA_ONEKI = 'hain-tayfa-oda-';
   const KOD_HARFLERI = 'ABCDEFGHJKLMNPRSTUVYZ23456789';  // karışabilecek O/0, I/1 yok
   const KOD_UZUNLUK = 5;
@@ -167,7 +167,7 @@ const Ag = (() => {
     $('onlineBaslaBtn').hidden = false;
     $('onlineBaslaBtn').disabled = !ag.misafirler.length;
     // Hain sayısını oda sahibi seçer (kişi sayısına göre seçenekler değişir)
-    $('onlineHainSatiri').hidden = false;
+    $('onlineHainSatiri').hidden = false; $('onlineTopSatiri').hidden = false; $('onlineHaritaSatiri').hidden = false;
     hainSecenekleri($('onlineHain'), isimler.length);
     gonder({ tip: 'lobi', isimler });
   }
@@ -258,7 +258,7 @@ const Ag = (() => {
     ag.basladi = true;
     ag.isimler = [ag.isimler[0], ...ag.misafirler.map(m => m.ad)];
     ag.tohum = Math.floor(Math.random() * 2 ** 31);
-    ag.ayar = { hain: $('onlineHain').value };
+    ag.ayar = { hain: $('onlineHain').value, top: $('onlineTop').value, harita: $('onlineHarita').value };
     gonder({ tip: 'basla', isimler: ag.isimler, tohum: ag.tohum, ayar: ag.ayar, defter: [] });
     $('onlineBaslaBtn').hidden = true;
     oyunuBaslat(ag.isimler, ag.tohum, ag.ayar);

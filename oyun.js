@@ -164,7 +164,8 @@ const kirilabilir = (o, alet, no) => no !== durum.sira && durum.oyuncular[no].al
 const tamirEdilecek = (kart, o) => kart.aletler.find(a => !o.aletler[a]);
 
 // ---------- Deste ----------
-function desteKur() {
+function desteKur(ayar = {}) {
+  const sayi = (v, varsayilan) => Math.max(0, Math.min(10, Number.isFinite(+v) && v !== '' && v != null ? +v : varsayilan));   // oda sahibinin seçtiği adet
   const deste = [];
   YOL_KARTLARI.forEach(([harfler, merkez, adet]) => {
     for (let n = 0; n < adet; n++) deste.push({ tur: 'yol', acik: kenarlar(harfler), merkez });
@@ -174,8 +175,8 @@ function desteKur() {
     for (let n = 0; n < 2; n++) deste.push({ tur: 'tamir', aletler: [alet] });
   });
   [['kazma', 'fener'], ['fener', 'pusula'], ['kazma', 'pusula']].forEach(aletler => deste.push({ tur: 'tamir', aletler }));
-  for (let n = 0; n < 4; n++) deste.push({ tur: 'top' });
-  for (let n = 0; n < 3; n++) deste.push({ tur: 'harita' });
+  for (let n = 0; n < sayi(ayar.top, 4); n++) deste.push({ tur: 'top' });
+  for (let n = 0; n < sayi(ayar.harita, 3); n++) deste.push({ tur: 'harita' });
   return karistir(deste);
 }
 
@@ -265,7 +266,7 @@ function menuKur() {
     try {
       localStorage.setItem(ISIM_ANAHTARI, JSON.stringify(isimler));
     } catch (e) { /* kaydedilemezse sorun değil */ }
-    oyunuBaslat(isimler, Math.floor(Math.random() * 2 ** 31), { hain: $('yerelHain').value });
+    oyunuBaslat(isimler, Math.floor(Math.random() * 2 ** 31), { hain: $('yerelHain').value, top: $('yerelTop').value, harita: $('yerelHarita').value });
   };
   $('tekrarBtn').onclick = menuyeDon;
   $('sesBtn').onclick = () => sesDugmesi(Ses.acKapa());
@@ -332,7 +333,7 @@ function oyunuBaslat(isimler, yeniTohum, ayar) {
   });
 
   // Kartları dağıt
-  durum.deste = desteKur();
+  durum.deste = desteKur(ayar);
   const elBoyu = n <= 5 ? 6 : 5;
   durum.oyuncular.forEach(o => (o.el = durum.deste.splice(-elBoyu)));
 
